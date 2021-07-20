@@ -1,9 +1,13 @@
 # COMP9417_Group_Project
 
 Random Forest  Jiaxuan Li
+
 LogReg   Yaxin Su
+
 KNN      Zekun Li
+
 Naive Bayes   Yuqing Shen
+
 XGBoost  Zhichuan Yu
 
 
