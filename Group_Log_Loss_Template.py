@@ -8,6 +8,25 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import log_loss
 
+def logloss(pred_y, y_ij):
+    max_p = 1-1e-15
+    min_p = 1e-15
+    num_of_Products = len(pred_y)
+    
+    pred_y[(pred_y >= max_p)] = max_p
+    pred_y[(pred_y <= min_p)] = min_p
+    
+    print(pred_y)
+    log_prob = np.log(pred_y)
+    y_multi_prob = np.multiply(y_ij,log_prob)
+    print("y_multi_prob: ", y_multi_prob)
+    y_multi_prob = np.array(y_multi_prob)
+    sum_value = np.sum(y_multi_prob)
+    print("Sum_value is: ",sum_value)
+    log_loss_value = -np.divide(sum_value,num_of_Products)
+    return log_loss_value
+
+
 np.random.seed(12)
 # train data import
 data = pd.read_csv('train.csv')
@@ -33,21 +52,5 @@ Multi_class_log_loss = logloss(pred_y,yij)
 print("The Multi Class Log Loss: ", Multi_class_log_loss)
 
 # Multi-Class Log-Loss
-def logloss(pred_y, y_ij):
-    max_p = 1-1e-15
-    min_p = 1e-15
-    num_of_Products = len(pred_y)
-    
-    pred_y[(pred_y >= max_p)] = max_p
-    pred_y[(pred_y <= min_p)] = min_p
-    
-    print(pred_y)
-    log_prob = np.log(pred_y)
-    y_multi_prob = np.multiply(y_ij,log_prob)
-    print("y_multi_prob: ", y_multi_prob)
-    y_multi_prob = np.array(y_multi_prob)
-    sum_value = np.sum(y_multi_prob)
-    print("Sum_value is: ",sum_value)
-    log_loss_value = -np.divide(sum_value,num_of_Products)
-    return log_loss_value
+
 
