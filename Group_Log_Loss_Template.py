@@ -16,13 +16,10 @@ def logloss(pred_y, y_ij):
     pred_y[(pred_y >= max_p)] = max_p
     pred_y[(pred_y <= min_p)] = min_p
     
-    print(pred_y)
     log_prob = np.log(pred_y)
     y_multi_prob = np.multiply(y_ij,log_prob)
-    print("y_multi_prob: ", y_multi_prob)
     y_multi_prob = np.array(y_multi_prob)
     sum_value = np.sum(y_multi_prob)
-    print("Sum_value is: ",sum_value)
     log_loss_value = -np.divide(sum_value,num_of_Products)
     return log_loss_value
 
