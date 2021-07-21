@@ -38,8 +38,8 @@ def logloss(pred_y, y_ij):
     min_p = 1e-15
     num_of_Products = len(pred_y)
     
-    pred_y[(pred_y >= 1)] = max_p
-    pred_y[(pred_y <= 0)] = min_p
+    pred_y[(pred_y >= max_p)] = max_p
+    pred_y[(pred_y <= min_p)] = min_p
     
     print(pred_y)
     log_prob = np.log(pred_y)
