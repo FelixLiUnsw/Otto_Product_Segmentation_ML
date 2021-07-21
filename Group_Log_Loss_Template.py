@@ -8,6 +8,8 @@ import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import log_loss
 
+# Multi-Class Log-Loss
+
 def logloss(pred_y, y_ij):
     max_p = 1-1e-15
     min_p = 1e-15
@@ -48,6 +50,5 @@ for i in range(len(valid_y)):
 Multi_class_log_loss = logloss(pred_y,yij)
 print("The Multi Class Log Loss: ", Multi_class_log_loss)
 
-# Multi-Class Log-Loss
 
 
