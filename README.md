@@ -28,7 +28,7 @@ Random Forest
 
 
 
-Random Forest    
+Extra Trees        
   Optimization    
   n_estimator = 150   
   depth = 40   
