@@ -1,10 +1,10 @@
 Jiaxuan Li
 
 Contribution:
-  Data Processing
-  Multi-class log loss function
-  Random Forest Classification
-  Extra Trees Classification
+  1. Data Processing     
+  2. Multi-class log loss function   
+  3. Random Forest Classification   
+  4. Extra Trees Classification   
 
 
 Random Forest
