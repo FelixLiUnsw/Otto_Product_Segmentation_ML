@@ -5,6 +5,7 @@ Contribution:
   2. Multi-class log loss function   
   3. Random Forest Classification   
   4. Extra Trees Classification   
+  5. Decision Trees Classification   
 
 Data Processing
 
