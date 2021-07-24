@@ -41,3 +41,8 @@ Extra Trees
 
 ![image](https://user-images.githubusercontent.com/37093162/126874334-6a13ec2e-0152-45f1-ba8f-970d57c94fd3.png)
 
+
+Extra Trees is faster. But Random forest has lower bias and vairance.
+
+
+
