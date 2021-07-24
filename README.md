@@ -6,11 +6,16 @@ Contribution:
   3. Random Forest Classification   
   4. Extra Trees Classification   
 
+Data Processing
+
+![image](https://user-images.githubusercontent.com/37093162/126872947-aefed9fe-6a0a-488f-84ca-a4a12b8229fe.png)
+
+
 
 Random Forest
   Optimization
-    n_estimator = 150
-    depth = 30
+    n_estimator = 150   
+    depth = 30   
 
 
 ![image](https://user-images.githubusercontent.com/37093162/126872707-e3549708-93ae-4d0a-b57c-9275e4504582.png)
