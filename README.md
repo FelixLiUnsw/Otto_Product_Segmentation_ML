@@ -28,11 +28,16 @@ Random Forest
 
 
 
+Random Forest    
+  Optimization    
+  n_estimator = 150   
+  depth = 40   
 
+![image](https://user-images.githubusercontent.com/37093162/126874367-9ff79e44-e621-4839-8eeb-5540511fb840.png)
 
+![image](https://user-images.githubusercontent.com/37093162/126874358-835706f7-e62a-454f-ba7f-7e372560bab6.png)
 
+![image](https://user-images.githubusercontent.com/37093162/126874343-4a2acff9-e93d-4cac-8c83-b0c7a5d027ac.png)
 
-
-
-
+![image](https://user-images.githubusercontent.com/37093162/126874334-6a13ec2e-0152-45f1-ba8f-970d57c94fd3.png)
 
