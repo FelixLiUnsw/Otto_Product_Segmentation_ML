@@ -1,0 +1,66 @@
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.preprocessing import MinMaxScaler
+from sklearn.model_selection import KFold
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
+def logloss(y,y_pred):
+    n = y.shape[0]
+    res = np.zeros(shape=(n,))
+    y_one_hot = np.eye(10)[y.astype(np.int32)]
+    y_pred = np.eye(10)[y_pred.astype(np.int32)]
+    y_ = np.log(y_pred+3**(-15))
+    for i in range(n):
+        res[i] = np.dot(y_one_hot[i][1:10],y_[i][1:10])
+    return -np.mean(res)
+
+def get_data():
+    train_data = np.genfromtxt(open("./train.csv","rb"),delimiter=",")
+    test_data = np.genfromtxt(open("./test.csv","rb"),delimiter=",")
+    train_data = train_data[1:61879,1:95]
+    test_data = test_data[1:144369,1:94]
+    X,y = train_data[:,:93],train_data[:,93]
+    scaler = MinMaxScaler()                                               
+    X_ = scaler.fit_transform(X)
+    test_data_ = scaler.fit_transform(test_data)
+    return X_,y,test_data_
+
+def cross_validation(num=10):
+    X,y,_ = get_data()
+    kf = KFold(n_splits=num, shuffle=False)
+    kf.get_n_splits(X)
+    loss_list = []
+    for i in [1,2,5,10,15,25,50,128,256,512,1024]:
+        loss = []
+        for train_index, val_index in kf.split(X):
+            X_train, X_test = X[train_index], X[val_index]
+            y_train, y_test = y[train_index], y[val_index]
+            knn = KNeighborsClassifier(n_neighbors=i)
+            knn.fit(X_train,y_train)
+            y_pred = knn.predict(X_test)
+            loss.append(logloss(y_test,y_pred))
+        loss_list.append(np.mean(loss))
+        print("i : {}, logloss : {}".format(i,np.mean(loss)))
+    return loss_list,np.argmin(loss_list)+1
+
+def knn_run(cv=True):
+    X,y,test_data = get_data()
+    loss_list,opti_k = cross_validation(num=10)  if cv else 2
+    knn = KNeighborsClassifier(n_neighbors=opti_k)
+    knn.fit(X,y)
+    y_pred = np.eye(10)[knn.predict(test_data).astype(np.int32)]
+    # plot
+    x = np.array([1,2,5,10,15,25,50,128,256,512,1024])
+    y = np.array(loss_list)
+    plt.title("logloss for parameter k")
+    plt.plot(x, y)
+    plt.savefig('./knn_plot.png')
+    # save data
+    pred_data = {'id':[i for i in range(1,144369)]}
+    for i in range(1,10):
+        pred_data["Class_"+str(i)] = y_pred[:,i]
+    data_df = pd.DataFrame(pred_data)
+    data_df.to_csv('submit.csv',index=False)
+
+knn_run()
