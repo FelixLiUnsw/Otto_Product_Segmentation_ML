@@ -4,7 +4,7 @@ Random Forest  Jiaxuan Li
 
 Extra Tree     Jiaxuan Li
 
-Decision Tree  Jiaxuan Li
+Gradient Boosting  Jiaxuan Li
 
 
 
