@@ -1,28 +1,36 @@
 from sklearn.preprocessing import MinMaxScaler
-from torch.autograd import Variable
+from sklearn.model_selection import KFold
+from sklearn import feature_selection
 import matplotlib.pyplot as plt
 import torch.nn.functional as F
-import torch.nn as nn
+from datetime import datetime
 import pandas as pd
 import numpy as np
 import torch
 
 batch_size = 64
+features   = 63
+epsilon    = 1e-5
 
 def logloss(y,y_pred):
     n = y.shape[0]
     res = np.zeros(shape=(n,))
     y_one_hot = np.eye(10)[y.astype(np.int32)]
+    y_pred_ = np.log(y_pred+epsilon)
     for i in range(n):
-        res[i] = np.dot(y_one_hot[i][1:10],y_pred[i])
-    return -torch.mean(torch.from_numpy(res))
+        res[i] = np.dot(y_one_hot[i][1:10],y_pred_[i])
+    return -np.mean(res)
 
 def data_process(X,y,test_data):
     # normalize
     scaler = MinMaxScaler()                                               
     X_ = scaler.fit_transform(X)
     test_data_ = scaler.fit_transform(test_data)
-    return X_,y,test_data_
+    scoreFun = feature_selection.chi2
+    sele = feature_selection.SelectKBest(score_func=scoreFun,k=features)
+    X_new = sele.fit_transform(X_,y)
+    test_data_new = sele.fit(X_,y).transform(test_data_)
+    return X_new,y,test_data_new
 
 def get_data():
     train_data = np.genfromtxt(open("./train.csv","rb"),delimiter=",")
@@ -48,11 +56,90 @@ class Net(torch.nn.Module):
         out = self.fc3(out)
         return self.sf(out)
 
+def train_nn(X,y,X_test,y_test,lr):
+    net = Net(features,128,9)
+    optimizer = torch.optim.Adam(net.parameters(), lr=lr)
+    loss_func = torch.nn.MSELoss()
+    for epoch in range(5):
+        for i in range(X.shape[0]//batch_size):
+            sample_index = np.random.choice(X.shape[0], batch_size)
+            x_train = X[sample_index,:]
+            y_train = np.eye(10)[y[sample_index].astype(np.int32)]
+            y_train = torch.FloatTensor(y_train[:,1:10])
+            y_pred = net(torch.FloatTensor(x_train))
+            loss = loss_func(y_train,y_pred)
+            # bp
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+    y_pred_test = net(torch.FloatTensor(X_test)).detach().numpy()
+    return y_pred_test
+    
+
+def cross_validation(num=10,metric=logloss):
+    X,y,_ = get_data()
+    kf = KFold(n_splits=num, shuffle=False)
+    kf.get_n_splits(X)
+    loss_list = []
+    lrs = [0.00000001,0.000001,0.00001,0.0001,0.001,0.01,0.1,0.5,0.9]
+    for lr in lrs:
+        loss = []
+        for train_index, val_index in kf.split(X):
+            X_train, X_test = X[train_index], X[val_index]
+            y_train, y_test = y[train_index], y[val_index]
+            y_pred_test = train_nn(X_train,y_train,X_test,y_test,lr)
+            loss.append(metric(y_test,y_pred_test))
+        loss_list.append(np.mean(loss))
+        print("lr : {}, metric : {}".format(lr,np.mean(loss)))
+    return loss_list
+
+def nn_run_2():
+    start_time = datetime.now()
+    logloss_list = cross_validation()
+    end_time = datetime.now()
+    print('Duration: {}'.format(end_time - start_time))
+    X,y,test_data = get_data()
+    net = Net(features,128,9)
+    optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
+    loss_func = torch.nn.MSELoss()
+    loss_list = []
+    for epoch in range(5):
+        for i in range(X.shape[0]//batch_size):
+            sample_index = np.random.choice(X.shape[0], batch_size)
+            x_train = X[sample_index,:]
+            y_train = np.eye(10)[y[sample_index].astype(np.int32)]
+            y_train = torch.FloatTensor(y_train[:,1:10])
+            y_pred = net(torch.FloatTensor(x_train))
+            loss = loss_func(y_train,y_pred)
+            loss_list.append(loss.item())
+            # bp
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+    # plot
+    # x = np.arange(0,len(loss_list),1)
+    # y = np.array(loss_list)
+    # plt.plot(x,y)
+    # plt.savefig('./nn_loss.png')
+
+    x = np.array([0.00000001,0.000001,0.00001,0.0001,0.001,0.01,0.1,0.5,0.9])
+    y = np.array(logloss_list)
+    plt.plot(x,y)
+    plt.savefig('./nn_logloss.png')
+
+    # save data
+    y_pred = net(torch.FloatTensor(test_data)).detach().numpy()
+    pred_data = {'id':[i for i in range(1,144369)]}
+    for i in range(9):
+        pred_data["Class_"+str(i+1)] = y_pred[:,i]
+    data_df = pd.DataFrame(pred_data)
+    data_df.to_csv('submit_nn.csv',index=False)
+
+
 def nn_run():
     X,y,test_data = get_data()
     net = Net(93,128,9)
     optimizer = torch.optim.Adam(net.parameters(), lr=0.001)
-    # loss_func = torch.nn.CrossEntropyLoss()
     loss_func = torch.nn.MSELoss()
     loss_list = []
     for epoch in range(5):
@@ -81,4 +168,5 @@ def nn_run():
     data_df = pd.DataFrame(pred_data)
     data_df.to_csv('submit_nn.csv',index=False)
 
-nn_run()
+
+nn_run_2()
