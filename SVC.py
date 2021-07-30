@@ -6,21 +6,19 @@ import numpy as np
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.model_selection import train_test_split,cross_val_score
+from sklearn.model_selection import train_test_split
 from sklearn import svm
 from sklearn.svm import SVC,LinearSVC
 np.random.seed(12)
-
 from sklearn.metrics import accuracy_score
 
-np.random.seed(12)
 # train data import
 data = pd.read_csv('train.csv')
 data_x = data.iloc[:, 1:94]
 data_y = data.iloc[:, 94:95]
 
 # test data import
-train_x, valid_x, train_y, valid_y = train_test_split(data_x, data_y, test_size=0.2, random_state=40)
+train_x, valid_x, train_y, valid_y = train_test_split(data_x, data_y, test_size=0.3, random_state=40)
 
 # ---------
 columns_list = ["Class_1", "Class_2", "Class_3", "Class_4", "Class_5", "Class_6", "Class_7", "Class_8", "Class_9"]
@@ -50,22 +48,18 @@ def logloss(pred_y, y_ij):
 
 # TODO -----------
 start=time.perf_counter()
-c_list=np.linspace(0.1,1,5)
-for c in c_list:
-    clf=SVC(C = c, kernel='rbf',probability=True)
-    clf.fit(train_x,train_y.values.ravel())
-    pred_y=clf.predict_proba(valid_x)
-    pred_y2=clf.predict(valid_x)
-    score=accuracy_score(valid_y,pred_y2)
-    print('c=',c,"accuracy:",score)
-    Multi_class_log_loss = logloss(pred_y, yij)
-    print("The Multi Class Log Loss: ", Multi_class_log_loss)
-    end = time.perf_counter()
-    print("running time: %s Senconds" % (end - start))
-    print()
 
-end=time.perf_counter()
-print("running time: %s Senconds"%(end-start))
+clf=SVC(C = 1.0, kernel='rbf',probability=True)
+clf.fit(train_x,train_y.values.ravel())
+pred_y=clf.predict_proba(valid_x)
+pred_y2=clf.predict(valid_x)
+score=accuracy_score(valid_y,pred_y2)
+print('c=',1,"accuracy:",score)
+Multi_class_log_loss = logloss(pred_y, yij)
+print("The Multi Class Log Loss: ", Multi_class_log_loss)
+end = time.perf_counter()
+print("running time: %s Senconds" % (end - start))
 print()
+
 
 
