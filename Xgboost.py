@@ -51,12 +51,8 @@ for nes in n_estimators:
     score = logloss(pred_y, yij)
     scores.append(score)
     print("test data log loss eval : {}".format(logloss(pred_y, yij)))
-plt.plot(n_estimators, scores, 'o-')
-plt.ylabel(logloss)
-plt.xlabel("n_estimator")
-plt.savefig('./n_estimator.png')
 print("best n_estimator {}".format(n_estimators[np.argmin(scores)]))
-plt.show()
+
 
 # optimize max_depth
 scores_md = []
@@ -69,11 +65,8 @@ for md in max_depths:
     score = logloss(pred_y, yij)
     scores_md.append(score)
     print("test data log loss eval : {}".format(logloss(pred_y, yij)))
-plt.plot(max_depths,scores_md,'o-')
-plt.ylabel(logloss)
-plt.xlabel("max_depth")
 print("best max_depth {}".format(max_depths[np.argmin(scores_md)]))
-plt.show()
+
 
 # optimize eta
 scores_eta = []
@@ -87,11 +80,8 @@ for eta in etas:
     score = logloss(pred_y, yij)
     scores_eta.append(score)
     print("test data log loss eval : {}".format(logloss(pred_y, yij)))
-plt.plot(etas,scores_eta,"o-")
-plt.ylabel(logloss)
-plt.xlabel("eta")
 print("best eta {}".format(etas[np.argmin(scores_eta)]))
-plt.show()
+
 
 # optimize min_child_weight
 scores_mcw = []
@@ -105,11 +95,7 @@ for mcw in min_child_weights:
     score = logloss(pred_y, yij)
     scores_mcw.append(score)
     print("test data log loss eval : {}".format(logloss(pred_y, yij)))
-plt.plot(min_child_weights,scores_mcw)
-plt.ylabel(logloss)
-plt.xlabel("min_child_weight")
 print("best min_child_weight {}".format(min_child_weights[np.argmin(scores_mcw)]))
-plt.show()
 
 # the best parameters
 xgb = xg.XGBClassifier(learning_rate =0.1, n_estimators=450,max_depth=7,min_child_weight=4,
