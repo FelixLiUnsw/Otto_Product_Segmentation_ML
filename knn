@@ -1,19 +1,40 @@
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.model_selection import KFold
+from sklearn import feature_selection
 import matplotlib.pyplot as plt
+from datetime import datetime
 import numpy as np
 import pandas as pd
+
+epsilon  = 1e-6
+features = 63
+
+def accuracy(y,y_pred):
+    ide = np.zeros_like(y)
+    ide[y==y_pred] = 1.0
+    return np.sum(ide)/ide.shape[0]
 
 def logloss(y,y_pred):
     n = y.shape[0]
     res = np.zeros(shape=(n,))
     y_one_hot = np.eye(10)[y.astype(np.int32)]
     y_pred = np.eye(10)[y_pred.astype(np.int32)]
-    y_ = np.log(y_pred+3**(-15))
+    y_ = np.log(y_pred+epsilon)
     for i in range(n):
         res[i] = np.dot(y_one_hot[i][1:10],y_[i][1:10])
     return -np.mean(res)
+
+def data_process(X,y,test_data):
+    # normalize
+    scaler = MinMaxScaler()                                               
+    X_ = scaler.fit_transform(X)
+    test_data_ = scaler.fit_transform(test_data)
+    scoreFun = feature_selection.chi2
+    sele = feature_selection.SelectKBest(score_func=scoreFun,k=features)
+    X_new = sele.fit_transform(X_,y)
+    test_data_new = sele.fit(X_,y).transform(test_data_)
+    return X_new,y,test_data_new
 
 def get_data():
     train_data = np.genfromtxt(open("./train.csv","rb"),delimiter=",")
@@ -21,12 +42,9 @@ def get_data():
     train_data = train_data[1:61879,1:95]
     test_data = test_data[1:144369,1:94]
     X,y = train_data[:,:93],train_data[:,93]
-    scaler = MinMaxScaler()                                               
-    X_ = scaler.fit_transform(X)
-    test_data_ = scaler.fit_transform(test_data)
-    return X_,y,test_data_
+    return data_process(X,y,test_data)
 
-def cross_validation(num=10):
+def cross_validation(num=10,metric=logloss):
     X,y,_ = get_data()
     kf = KFold(n_splits=num, shuffle=False)
     kf.get_n_splits(X)
@@ -39,21 +57,25 @@ def cross_validation(num=10):
             knn = KNeighborsClassifier(n_neighbors=i)
             knn.fit(X_train,y_train)
             y_pred = knn.predict(X_test)
-            loss.append(logloss(y_test,y_pred))
+            loss.append(metric(y_test,y_pred))
         loss_list.append(np.mean(loss))
-        print("i : {}, logloss : {}".format(i,np.mean(loss)))
+        print("i : {}, metric : {}".format(i,np.mean(loss)))
     return loss_list,np.argmin(loss_list)+1
 
-def knn_run(cv=True):
+def knn_run(name,metric=logloss,cv=True):
     X,y,test_data = get_data()
-    loss_list,opti_k = cross_validation(num=10)  if cv else 2
+    start_time = datetime.now()
+    loss_list,opti_k = cross_validation(num=10,metric=metric)  if cv else 2
+    end_time = datetime.now()
+    print('Duration: {}'.format(end_time - start_time))
+    
     knn = KNeighborsClassifier(n_neighbors=opti_k)
     knn.fit(X,y)
     y_pred = np.eye(10)[knn.predict(test_data).astype(np.int32)]
     # plot
     x = np.array([1,2,5,10,15,25,50,128,256,512,1024])
     y = np.array(loss_list)
-    plt.title("logloss for parameter k")
+    plt.title(name+" for parameter k")
     plt.plot(x, y)
     plt.savefig('./knn_plot.png')
     # save data
@@ -63,4 +85,4 @@ def knn_run(cv=True):
     data_df = pd.DataFrame(pred_data)
     data_df.to_csv('submit.csv',index=False)
 
-knn_run()
+knn_run(name='Logloss')
