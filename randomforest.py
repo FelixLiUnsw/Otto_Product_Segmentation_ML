@@ -113,7 +113,7 @@ if __name__ == "__main__":
     pred_y_40_r = classifiers(40)
     ploting(pred_y_40_r, y_ij,40,"randomforest")
 
-    # best random forest parameter in range 160-185 trees and 25-35 depth
+    # best random forest parameter in range 165-185 trees and 25-35 depth
     # using cross validation to find the local minimum (HalvingGridSearchCV)
     best_rf= cross_validation(165,185,25,35)
     print("Optimized random forest: ", best_rf)
