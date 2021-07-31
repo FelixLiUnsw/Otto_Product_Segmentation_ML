@@ -10,7 +10,7 @@ import torch
 
 batch_size = 64
 features   = 63
-epsilon    = 1e-5
+epsilon    = 8e-3
 
 def logloss(y,y_pred):
     n = y.shape[0]
@@ -33,12 +33,14 @@ def data_process(X,y,test_data):
     return X_new,y,test_data_new
 
 def get_data():
-    train_data = np.genfromtxt(open("./train.csv","rb"),delimiter=",")
+    train_data = pd.read_csv("train.csv")
     test_data = np.genfromtxt(open("./test.csv","rb"),delimiter=",")
-    train_data = train_data[1:61879,1:95]
     test_data = test_data[1:144369,1:94]
-    X,y = train_data[:,:93],train_data[:,93]
+    X,y = train_data.values[:,1:94],[]
+    for idx,_ in enumerate(train_data['target']):y.append(train_data['target'][idx][6])
+    y = np.array(y)
     return data_process(X,y,test_data)
+
 
 class Net(torch.nn.Module):
     def __init__(self,n_input,n_hidden,n_output):
