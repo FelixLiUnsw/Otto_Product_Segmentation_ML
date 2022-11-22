@@ -1,5 +1,5 @@
 # Random Forest Classification
-# Jiaxuan Li z5086369
+# Jiaxuan Li
 from sklearn.ensemble import RandomForestClassifier
 from sklearn import metrics
 import pandas as pd
