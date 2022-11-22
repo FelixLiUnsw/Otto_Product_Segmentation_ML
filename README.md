@@ -1,10 +1,13 @@
 # COMP9417_Group_Project
+# OTTO Products Classification
+The model has been saved into the branches.
 
-Random Forest  Jiaxuan Li
 
-Extra Tree     Jiaxuan Li
+Random Forest  Jiaxuan Felix Li
 
-Gradient Boosting  Jiaxuan Li
+Extra Tree     Jiaxuan Felix Li
+
+Gradient Boosting  Jiaxuan Felix Li
 
 
 
