@@ -1,4 +1,3 @@
-# COMP9417_Group_Project
 # OTTO Products Classification
 The model has been saved into the branches.
 
