@@ -1,6 +1,6 @@
 # Ensemble Method
 # Random Forest Algorithm
-# Jiaxuan Li z5086369
+# Jiaxuan Li
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import GridSearchCV,KFold
 from sklearn.experimental import enable_halving_search_cv
